@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Resizer with Transparent Padding</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        canvas { border: 1px solid #ccc; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h2>Upload an Image</h2>
+    <input type="file" id="imageInput" accept="image/*"><br><br>
+    <label>Output Width: <input type="number" id="outputWidth" value="800"></label>
+    <label>Output Height: <input type="number" id="outputHeight" value="600"></label>
+    <button onclick="resizeImage()">Resize Image</button>
+    <br><br>
+    <canvas id="canvas"></canvas>
+    <br><br>
+    <a id="downloadLink" style="display: none;" download="resized-image.png">Download Image</a>
+
+    <script>
+        function resizeImage() {
+            const fileInput = document.getElementById('imageInput');
+            const outputWidth = parseInt(document.getElementById('outputWidth').value);
+            const outputHeight = parseInt(document.getElementById('outputHeight').value);
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            if (fileInput.files.length === 0) {
+                alert("Please upload an image first.");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const img = new Image();
+            img.onload = function() {
+                const aspectRatio = img.width / img.height;
+                let newWidth, newHeight;
+
+                if (outputWidth / outputHeight > aspectRatio) {
+                    newHeight = outputHeight;
+                    newWidth = newHeight * aspectRatio;
+                } else {
+                    newWidth = outputWidth;
+                    newHeight = newWidth / aspectRatio;
+                }
+
+                canvas.width = outputWidth;
+                canvas.height = outputHeight;
+                ctx.clearRect(0, 0, outputWidth, outputHeight);
+                ctx.drawImage(img, (outputWidth - newWidth) / 2, (outputHeight - newHeight) / 2, newWidth, newHeight);
+
+                const downloadLink = document.getElementById('downloadLink');
+                downloadLink.href = canvas.toDataURL('image/png');
+                downloadLink.style.display = 'block';
+            };
+            img.src = URL.createObjectURL(file);
+        }
+    </script>
+</body>
+</html>
